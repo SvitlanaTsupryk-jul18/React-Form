@@ -5,6 +5,15 @@ import regions from "./data/regions";
 import values from "./data/values";
 import { createForm } from "final-form";
 
+const fieldNames = [
+  "edrpou",
+  "legal_form",
+  "name",
+  "short_name",
+  "public_name",
+  "owner_property_type"
+];
+
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const onSubmit = async values => {
@@ -33,7 +42,7 @@ class Form extends React.Component {
     );
 
     // register fields
-    this.unsubscribeFields = ["firstName", "lastName"].map(fieldName =>
+    this.unsubscribeFields = fieldNames.map(fieldName =>
       this.form.registerField(
         fieldName,
         fieldState => {
@@ -44,7 +53,7 @@ class Form extends React.Component {
             this.setState({ [fieldName]: fieldState });
           }
         },
-        { value: true }
+        { value: true, valid: true, active: true, touched: true }
       )
     );
 
@@ -62,48 +71,167 @@ class Form extends React.Component {
     this.form.submit();
   };
 
+  selectItem = target => {
+    this.setState({
+      ...this.Formstate,
+      [target.name]: {
+        name: target.name,
+        value: target.value,
+        valid: true,
+        active: true,
+        touched: true
+      }
+    });
+  };
+
   render() {
-    const { formState, firstName, lastName } = this.state;
+    const {
+      formState,
+      firstName,
+      name,
+      edrpou,
+      legal_form,
+      short_name,
+      public_name,
+      owner_property_type
+    } = this.state;
     return (
-      <div>
-        <h1>🏁 Final Form - Simple React Example</h1>
-        <a href="https://github.com/erikras/final-form#-final-form">
-          Read Docs
-        </a>
-        <p>
-          This is primarily for educational purposes. If you are using React,
-          you should <em>probably</em> be using{" "}
-          <a href="https://github.com/erikras/react-final-form#-react-final-form">
-            🏁 React Final Form
-          </a>
-          .
-        </p>
+      <div className="form">
+        <h1>🏁 Final Form</h1>
+
         <form onSubmit={this.handleSubmit}>
-          <div>
-            <label>First Name</label>
-            <input
-              name="firstName"
-              onBlur={() => firstName.blur()}
-              onChange={event =>
-                firstName.change(event.target.value || undefined)
-              }
-              onFocus={() => firstName.focus()}
-              value={firstName.value || ""}
-              placeholder="First Name"
-            />
+          <legend>Створити профіль медичного закладу. Крок 1</legend>
+          <div className="row">
+            <div className="row_item">
+              <label
+                htmlFor="edrpou"
+                className={
+                  this.state.edrpou.touched || this.state.edrpou.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                ЄДРПОУ*
+              </label>
+              <input
+                name="edrpou"
+                type="text"
+                id="edrpou"
+                maxLength="8"
+                onBlur={() => edrpou.blur()}
+                onChange={event =>
+                  edrpou.change(event.target.value || undefined)
+                }
+                onFocus={() => edrpou.focus()}
+                value={edrpou.value || ""}
+                placeholder="ЄДРПОУ*"
+                // required
+              />
+            </div>
+            <div className="row_item">
+              <label htmlFor="legal_form">Організаційно-правова форма*</label>
+              <select
+                name="legal_form"
+                value={legal_form.value}
+                onChange={event => this.selectItem(event.target)}
+              >
+                <option value="140">ДЕРЖАВНЕ ПІДПРИЄМСТВО</option>
+                <option value="995">ІНШІ ОРГАНІЗАЦІЙНО-ПРАВОВІ ФОРМИ</option>
+                <option value="230">АКЦІОНЕРНЕ ТОВАРИСТВО</option>
+                <option value="231">ВІДКРИТЕ АКЦІОНЕРНЕ ТОВАРИСТВО</option>
+                <option value="235">
+                  ДЕРЖАВНА АКЦІОНЕРНА КОМПАНІЯ (ТОВАРИСТВО)
+                </option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label>Last Name</label>
-            <input
-              name="firstName"
-              onBlur={() => lastName.blur()}
-              onChange={event =>
-                lastName.change(event.target.value || undefined)
-              }
-              onFocus={() => lastName.focus()}
-              value={lastName.value || ""}
-              placeholder="Last Name"
-            />
+          <div className="row">
+            <div className="row_item">
+              <label
+                htmlFor="name"
+                className={
+                  this.state.name.touched || this.state.name.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Повна назва*
+              </label>
+              <input
+                name="name"
+                type="text"
+                id="name"
+                maxLength="8"
+                onBlur={() => name.blur()}
+                onChange={event => name.change(event.target.value || undefined)}
+                onFocus={() => name.focus()}
+                value={name.value || ""}
+                placeholder="Повна назва*"
+                // required
+              />
+            </div>
+            <div className="row_item">
+              <label
+                htmlFor="short_name"
+                className={
+                  this.state.short_name.touched || this.state.short_name.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Cкорочена назва (за наявності)
+              </label>
+              <input
+                name="short_name"
+                type="text"
+                id="short_name"
+                onBlur={() => short_name.blur()}
+                onChange={event =>
+                  short_name.change(event.target.value || undefined)
+                }
+                onFocus={() => short_name.focus()}
+                value={short_name.value || ""}
+                placeholder="Cкорочена назва (за наявності)"
+              />
+            </div>
+          </div>
+          <div className="row">
+            <div className="row_item">
+              <label
+                htmlFor="public_name"
+                className={
+                  this.state.public_name.touched ||
+                  this.state.public_name.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Публічна назва (якщо відрізняється)
+              </label>
+              <input
+                name="public_name"
+                type="text"
+                id="public_name"
+                onBlur={() => public_name.blur()}
+                onChange={event =>
+                  public_name.change(event.target.value || undefined)
+                }
+                onFocus={() => public_name.focus()}
+                value={public_name.value || ""}
+                placeholder="Публічна назва (якщо відрізняється)"
+              />
+            </div>
+            <div className="row_item">
+              <label htmlFor="owner_property_type">Тип закладу*</label>
+              <select
+                name="owner_property_type"
+                value={owner_property_type.value}
+                onChange={event => this.selectItem(event.target)}
+              >
+                <option value="STATE">бюджетна форма власності</option>
+                <option value="PRIVATE">приватна форма власності</option>
+              </select>
+            </div>
           </div>
           <div className="buttons">
             <button type="submit" disabled={formState.submitting}>

@@ -61,11 +61,14 @@ input[type="text"] {
   transition: all 0.3s;
 }
 label {
-  transform: translateY(140%) scale(0.8);
-  transition: all 0.2s;
+  transform: translateY(140%) scale(1);
+  transition: all 0.3s;
+  transform-origin: left;
   visibility: hidden;
+  display: inline-block;
 }
 .touched {
-  transform: translateY(0%) scale(1);
+  transform: translateY(0%) scale(0.8);
   visibility: visible;
+  transform-origin: left;
 }
