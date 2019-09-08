@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import regions from "./data/regions";
 import values from "./data/values";
@@ -11,47 +10,17 @@ const fieldNames = [
   "name",
   "short_name",
   "public_name",
-  "owner_property_type"
+  "owner_property_type",
+  "area",
+  "area_reg",
+  "area_city",
+  "area_street",
+  "area_street_name"
 ];
-// const validationInput = name => {
-//   console.log(this, this.state, name);
-// action.currentInput.classList.remove("error");
-// let validReq = false;
-// switch (name) {
-//   case "edrpou":
-//     validReq = action.currentInput.value.length > 3;
-//     break;
-//   case "userEmail":
-//     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-//     validReq = re.test(String(action.currentInput.value).toLowerCase());
-//     break;
-//   case "userPassword":
-//     validReq = action.currentInput.value.length > 5;
-//     break;
-//   case "passwordConfirm":
-//     validReq = action.currentInput.value === state.userPassword;
-//     if (validReq === false) {
-//       console.log(validReq);
-//       action.currentInput.classList.add("error");
-//       return {
-//         ...state,
-//         warning: "Your passwords do not match"
-//       };
-//     }
-//     break;
-//   default:
-//     validReq = false;
-// }
-// if (action.currentInput.value && validReq) {
-//   action.currentInput.classList.add("valid");
-//   return {
-//     ...state,
-//     isValid: true
-//   };
-// } else action.currentInput.classList.add("error");
-// };
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+let Url=https://reform.helsi.me/signer/register-document;
 
 const onSubmit = async values => {
   await sleep(300);
@@ -63,19 +32,23 @@ class Form extends React.Component {
     super();
     const initialState = {};
     let inConstructor = true;
-    this.form = createForm({ onSubmit });
+    this.form = createForm({ onSubmit, validate: this.validate });
 
     // subscribe to form changes
     this.unsubscribe = this.form.subscribe(
       formState => {
-        // cannot call setState in constructor, but need to on subsequent notifications
         if (inConstructor) {
           initialState.formState = formState;
         } else {
           this.setState({ formState });
         }
       },
-      { active: true, pristine: true, submitting: true, values: true }
+      {
+        active: true,
+        pristine: true,
+        submitting: true,
+        values: true
+      }
     );
 
     // register fields
@@ -83,7 +56,6 @@ class Form extends React.Component {
       this.form.registerField(
         fieldName,
         fieldState => {
-          // cannot call setState in constructor, but need to on subsequent notifications
           if (inConstructor) {
             initialState[fieldName] = fieldState;
           } else {
@@ -120,52 +92,70 @@ class Form extends React.Component {
       }
     });
   };
+
+  validate = values => {
+    let copy = { ...this.state };
+    delete copy.formState;
+    let valid = true;
+    for (let key in copy) {
+      valid = valid * copy[key].valid;
+    }
+    return Boolean(valid);
+  };
+
   validationInput = target => {
+    target.classList.remove("error");
     switch (target.name) {
       case "edrpou":
         if (
           !this.state[target.name].value ||
           this.state[target.name].value.length < 7
         ) {
+          target.classList.add("error");
           this.setState({
             ...this.state,
             [target.name]: {
               ...this.state[target.name],
-              valid: false
-            }
-          });
-        }
-        break;
-      case "name":
-        if (!this.state[target.name].value) {
-          this.setState({
-            ...this.state,
-            [target.name]: {
-              ...this.state[target.name],
-              valid: false
+              valid: false,
+              active: false,
+              touched: true
             }
           });
         }
         break;
       default:
-        return this.state;
+        if (!this.state[target.name].value) {
+          target.classList.add("error");
+          this.setState({
+            ...this.state,
+            [target.name]: {
+              ...this.state[target.name],
+              valid: false,
+              active: false,
+              touched: true
+            }
+          });
+        }
     }
   };
   render() {
     const {
       formState,
-      firstName,
       name,
       edrpou,
       legal_form,
       short_name,
       public_name,
-      owner_property_type
+      owner_property_type,
+      area,
+      area_reg,
+      area_city,
+      area_street,
+      area_street_name
     } = this.state;
     return (
       <div className="form">
         <h1>🏁 Final Form</h1>
-
         <form onSubmit={this.handleSubmit}>
           <legend>Створити профіль медичного закладу. Крок 1</legend>
           <div className="row">
@@ -191,7 +181,7 @@ class Form extends React.Component {
                 }
                 onFocus={() => edrpou.focus()}
                 value={edrpou.value || ""}
-                placeholder="ЄДРПОУ*"
+                placeholder=""
                 className={this.state.edrpou.active ? "active--input" : ""}
                 // required
               />
@@ -204,7 +194,9 @@ class Form extends React.Component {
               </div>
             </div>
             <div className="row_item">
-              <label htmlFor="legal_form">Організаційно-правова форма*</label>
+              <label className="touched" htmlFor="legal_form">
+                Організаційно-правова форма*
+              </label>
               <select
                 name="legal_form"
                 value={legal_form.value}
@@ -236,11 +228,11 @@ class Form extends React.Component {
                 name="name"
                 type="text"
                 id="name"
-                onBlur={() => name.blur()}
+                onBlur={event => this.validationInput(event.target)}
                 onChange={event => name.change(event.target.value || undefined)}
                 onFocus={() => name.focus()}
                 value={name.value || ""}
-                placeholder="Повна назва*"
+                placeholder=""
                 className={this.state.name.active ? "active--input" : ""}
                 // required
               />
@@ -271,7 +263,7 @@ class Form extends React.Component {
                 }
                 onFocus={() => short_name.focus()}
                 value={short_name.value || ""}
-                placeholder="Cкорочена назва (за наявності)"
+                placeholder=""
                 className={this.state.short_name.active ? "active--input" : ""}
               />
             </div>
@@ -299,12 +291,14 @@ class Form extends React.Component {
                 }
                 onFocus={() => public_name.focus()}
                 value={public_name.value || ""}
-                placeholder="Публічна назва (якщо відрізняється)"
+                placeholder=""
                 className={this.state.public_name.active ? "active--input" : ""}
               />
             </div>
             <div className="row_item">
-              <label htmlFor="owner_property_type">Тип закладу*</label>
+              <label htmlFor="owner_property_type" className="touched">
+                Тип закладу*
+              </label>
               <select
                 name="owner_property_type"
                 value={owner_property_type.value}
@@ -313,6 +307,157 @@ class Form extends React.Component {
                 <option value="STATE">бюджетна форма власності</option>
                 <option value="PRIVATE">приватна форма власності</option>
               </select>
+            </div>
+          </div>
+          <legend>Види діяльності</legend>
+          <div>
+            <label className="touched" htmlFor="owner_property_type">
+              Обов'язковий КВЕД*
+            </label>
+            <select
+              name="owner_property_type"
+              value={owner_property_type.value}
+              onChange={event => this.selectItem(event.target)}
+            >
+              <option value="86.10">
+                86.10. Діяльність лікарняних закладів
+              </option>
+              <option value="86.21">86.21. Загальна медична практика</option>
+            </select>
+          </div>
+          <legend>Адреса</legend>
+          <div>Фактичне місцезнаходження*</div>
+          <div className="row">
+            <div className="row_item--lit">
+              <label className="touched" htmlFor="area">
+                Область
+              </label>
+              <select
+                name="area"
+                value={area.value}
+                onChange={event => this.selectItem(event.target)}
+              >
+                {regions.map(region => (
+                  <option key={region.id} value={region.name}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="row_item--lit">
+              <label
+                htmlFor="area_reg"
+                className={
+                  this.state.area_reg.touched || this.state.area_reg.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Район
+              </label>
+              <input
+                name="area_reg"
+                type="text"
+                id="area_reg"
+                onBlur={() => area_reg.blur()}
+                onChange={event =>
+                  area_reg.change(event.target.value || undefined)
+                }
+                onFocus={() => area_reg.focus()}
+                value={area_reg.value || ""}
+                placeholder=""
+                className={this.state.area_reg.active ? "active--input" : ""}
+              />
+            </div>
+            <div className="row_item--lit">
+              <label
+                htmlFor="area_city"
+                className={
+                  this.state.area_city.touched || this.state.area_city.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Населений пункт*
+              </label>
+              <input
+                name="area_city"
+                type="text"
+                id="area_city"
+                onBlur={event => this.validationInput(event.target)}
+                onChange={event =>
+                  area_city.change(event.target.value || undefined)
+                }
+                onFocus={() => area_city.focus()}
+                value={area_city.value || ""}
+                placeholder=""
+                className={this.state.area_city.active ? "active--input" : ""}
+                // required
+              />
+              <div
+                className={
+                  this.state.area_city.valid === false ? "warning" : "hide"
+                }
+              >
+                Поле не мoже бути пустим
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="row_item">
+              <label className="touched" htmlFor="area_street">
+                Тип вулицi*
+              </label>
+              <select
+                name="area_street"
+                value={area_street.value}
+                onChange={event => this.selectItem(event.target)}
+              >
+                <option value="вулиця">вулиця</option>
+                {streets.map((street, index) => (
+                  <option key={index} value={street}>
+                    {street}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="row_item">
+              <label
+                htmlFor="area_street_name"
+                className={
+                  this.state.area_street_name.touched ||
+                  this.state.area_street_name.active
+                    ? "touched"
+                    : ""
+                }
+              >
+                Назва вулицi*
+              </label>
+              <input
+                name="area_street_name"
+                type="text"
+                id="area_street_name"
+                onBlur={event => this.validationInput(event.target)}
+                onChange={event =>
+                  area_street_name.change(event.target.value || undefined)
+                }
+                onFocus={() => area_street_name.focus()}
+                value={area_street_name.value || ""}
+                placeholder=""
+                className={
+                  this.state.area_street_name.active ? "active--input" : ""
+                }
+                // required
+              />
+              <div
+                className={
+                  this.state.area_street_name.valid === false
+                    ? "warning"
+                    : "hide"
+                }
+              >
+                Поле не мoже бути пустим
+              </div>
             </div>
           </div>
           <div className="buttons">
@@ -335,3 +480,10 @@ class Form extends React.Component {
 }
 
 export default Form;
+
+const getInfo = type => {
+  let infos = values.filter(el => el.name === type);
+  return Object.values(infos[0].values);
+};
+
+const streets = getInfo("STREET_TYPE");

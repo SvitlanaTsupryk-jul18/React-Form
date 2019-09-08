@@ -1,4 +1,4 @@
-export const values = [
+const values = [
   {
     values: {
       MALE: "чоловіча",
@@ -76,3 +76,4 @@ export const values = [
     is_active: true
   }
 ];
+export default values;

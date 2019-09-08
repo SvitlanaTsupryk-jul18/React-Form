@@ -1,7 +1,7 @@
 const ObjectId = val => val;
 const ISODate = date => date;
 
-export const regions = [
+const regions = [
   {
     _id: ObjectId("5b3987d829cece0c6c7bd193"),
     name: "АВТОНОМНА РЕСПУБЛІКА КРИМ",
@@ -245,3 +245,5 @@ export const regions = [
     request_date: ISODate("2018-07-02T02:03:04.000Z")
   }
 ];
+
+export default regions;
