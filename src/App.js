@@ -13,6 +13,43 @@ const fieldNames = [
   "public_name",
   "owner_property_type"
 ];
+// const validationInput = name => {
+//   console.log(this, this.state, name);
+// action.currentInput.classList.remove("error");
+// let validReq = false;
+// switch (name) {
+//   case "edrpou":
+//     validReq = action.currentInput.value.length > 3;
+//     break;
+//   case "userEmail":
+//     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+//     validReq = re.test(String(action.currentInput.value).toLowerCase());
+//     break;
+//   case "userPassword":
+//     validReq = action.currentInput.value.length > 5;
+//     break;
+//   case "passwordConfirm":
+//     validReq = action.currentInput.value === state.userPassword;
+//     if (validReq === false) {
+//       console.log(validReq);
+//       action.currentInput.classList.add("error");
+//       return {
+//         ...state,
+//         warning: "Your passwords do not match"
+//       };
+//     }
+//     break;
+//   default:
+//     validReq = false;
+// }
+// if (action.currentInput.value && validReq) {
+//   action.currentInput.classList.add("valid");
+//   return {
+//     ...state,
+//     isValid: true
+//   };
+// } else action.currentInput.classList.add("error");
+// };
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -83,7 +120,37 @@ class Form extends React.Component {
       }
     });
   };
-
+  validationInput = target => {
+    switch (target.name) {
+      case "edrpou":
+        if (
+          !this.state[target.name].value ||
+          this.state[target.name].value.length < 7
+        ) {
+          this.setState({
+            ...this.state,
+            [target.name]: {
+              ...this.state[target.name],
+              valid: false
+            }
+          });
+        }
+        break;
+      case "name":
+        if (!this.state[target.name].value) {
+          this.setState({
+            ...this.state,
+            [target.name]: {
+              ...this.state[target.name],
+              valid: false
+            }
+          });
+        }
+        break;
+      default:
+        return this.state;
+    }
+  };
   render() {
     const {
       formState,
@@ -117,16 +184,24 @@ class Form extends React.Component {
                 name="edrpou"
                 type="text"
                 id="edrpou"
-                maxLength="8"
-                onBlur={() => edrpou.blur()}
+                maxLength="10"
+                onBlur={event => this.validationInput(event.target)}
                 onChange={event =>
                   edrpou.change(event.target.value || undefined)
                 }
                 onFocus={() => edrpou.focus()}
                 value={edrpou.value || ""}
                 placeholder="ЄДРПОУ*"
+                className={this.state.edrpou.active ? "active--input" : ""}
                 // required
               />
+              <div
+                className={
+                  this.state.edrpou.valid === false ? "warning" : "hide"
+                }
+              >
+                ЄДРПОУ введено некоректно, поле повинно містити 8 або 10 цифр
+              </div>
             </div>
             <div className="row_item">
               <label htmlFor="legal_form">Організаційно-правова форма*</label>
@@ -161,14 +236,19 @@ class Form extends React.Component {
                 name="name"
                 type="text"
                 id="name"
-                maxLength="8"
                 onBlur={() => name.blur()}
                 onChange={event => name.change(event.target.value || undefined)}
                 onFocus={() => name.focus()}
                 value={name.value || ""}
                 placeholder="Повна назва*"
+                className={this.state.name.active ? "active--input" : ""}
                 // required
               />
+              <div
+                className={this.state.name.valid === false ? "warning" : "hide"}
+              >
+                Поле не може бути пустим
+              </div>
             </div>
             <div className="row_item">
               <label
@@ -192,6 +272,7 @@ class Form extends React.Component {
                 onFocus={() => short_name.focus()}
                 value={short_name.value || ""}
                 placeholder="Cкорочена назва (за наявності)"
+                className={this.state.short_name.active ? "active--input" : ""}
               />
             </div>
           </div>
@@ -219,6 +300,7 @@ class Form extends React.Component {
                 onFocus={() => public_name.focus()}
                 value={public_name.value || ""}
                 placeholder="Публічна назва (якщо відрізняється)"
+                className={this.state.public_name.active ? "active--input" : ""}
               />
             </div>
             <div className="row_item">

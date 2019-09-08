@@ -45,7 +45,7 @@ select {
   height: 3.1rem;
 }
 input[type="text"] {
-  margin: 0 0 10px;
+  /* margin: 0 0 10px; */
   background-color: transparent;
   border: none;
   border-bottom: 1px solid #9e9e9e;
@@ -54,7 +54,7 @@ input[type="text"] {
   height: 3rem;
   width: 100%;
   font-size: 1rem;
-  margin: 0 0 20px 0;
+  /* margin: 0 0 20px 0; */
   padding: 0;
   box-shadow: none;
   box-sizing: content-box;
@@ -71,4 +71,28 @@ label {
   transform: translateY(0%) scale(0.8);
   visibility: visible;
   transform-origin: left;
+}
+.active--label {
+  color: #199ed8;
+}
+#public_name.active--input,
+#short_name.active--input,
+#name.active--input {
+  border-bottom: 1px solid #199ed8;
+  box-shadow: 0 1px 0 0 #199ed8;
+}
+.warning {
+  text-align: right;
+  color: #f44336;
+  font-size: 11px;
+  font-weight: 400;
+  display: block;
+  top: 85%;
+  right: 12px;
+  text-align: right;
+  line-height: 0.9;
+  margin-top: 2px;
+}
+.hide {
+  display: none;
 }
