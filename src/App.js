@@ -20,11 +20,8 @@ const fieldNames = [
   "area_street_name"
 ];
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 const onSubmit = async values => {
   await postData(values);
-  window.alert(JSON.stringify(values, 0, 2));
 };
 
 class Form extends React.Component {
@@ -75,9 +72,11 @@ class Form extends React.Component {
     this.unsubscribeFields.forEach(unsubscribe => unsubscribe());
   }
 
-  handleSubmit = event => {
+  handleSubmit = async event => {
     event.preventDefault();
-    this.form.submit();
+    const { sendData } = this.props;
+    sendData(values);
+    await postData(values);
   };
 
   selectItem = target => {
@@ -183,7 +182,7 @@ class Form extends React.Component {
                 value={edrpou.value || ""}
                 placeholder=""
                 className={this.state.edrpou.active ? "active--input" : ""}
-                // required
+                required
               />
               <div
                 className={
@@ -234,7 +233,7 @@ class Form extends React.Component {
                 value={name.value || ""}
                 placeholder=""
                 className={this.state.name.active ? "active--input" : ""}
-                // required
+                required
               />
               <div
                 className={this.state.name.valid === false ? "warning" : "hide"}
@@ -392,7 +391,7 @@ class Form extends React.Component {
                 value={area_city.value || ""}
                 placeholder=""
                 className={this.state.area_city.active ? "active--input" : ""}
-                // required
+                required
               />
               <div
                 className={
@@ -447,7 +446,7 @@ class Form extends React.Component {
                 className={
                   this.state.area_street_name.active ? "active--input" : ""
                 }
-                // required
+                required
               />
               <div
                 className={
@@ -461,18 +460,14 @@ class Form extends React.Component {
             </div>
           </div>
           <div className="buttons">
-            <button type="submit" disabled={formState.submitting}>
+            <button
+              className="btn"
+              type="submit"
+              disabled={formState.submitting}
+            >
               Submit
             </button>
-            <button
-              type="button"
-              onClick={() => this.form.reset()}
-              disabled={formState.submitting || formState.pristine}
-            >
-              Reset
-            </button>
           </div>
-          <pre>{JSON.stringify(this.state, 0, 2)}</pre>
         </form>
       </div>
     );
@@ -483,7 +478,6 @@ const getInfo = type => {
   let infos = values.filter(el => el.name === type);
   return Object.values(infos[0].values);
 };
-
 const streets = getInfo("STREET_TYPE");
 
 const mapDispatch = dispatch => ({

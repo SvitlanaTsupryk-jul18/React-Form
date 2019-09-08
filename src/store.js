@@ -15,7 +15,3 @@ const reducer = (state, action) => {
 const store = createStore(reducer);
 
 export default store;
-
-store.subscribe(() => {
-  console.log("store -", store.getState());
-});

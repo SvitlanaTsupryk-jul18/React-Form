@@ -105,3 +105,32 @@ label {
   border-bottom: 1px solid #f44336 !important;
   box-shadow: 0 1px 0 0 #f44336 !important;
 }
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.btn {
+  border-radius: 2px;
+  display: inline-block;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 2rem;
+  text-transform: uppercase;
+  vertical-align: middle;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: 0.2s ease-out;
+  cursor: pointer;
+  white-space: nowrap;
+  margin: 0.75rem;
+  color: #fff;
+  background-color: #199ed8;
+  border: none;
+  box-shadow: none;
+}
+.btn:focus,
+.btn:hover {
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
