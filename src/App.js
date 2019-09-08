@@ -3,6 +3,8 @@ import "./App.css";
 import regions from "./data/regions";
 import values from "./data/values";
 import { createForm } from "final-form";
+import { connect } from "react-redux";
+import postData from "./api";
 
 const fieldNames = [
   "edrpou",
@@ -20,10 +22,8 @@ const fieldNames = [
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-let Url=https://reform.helsi.me/signer/register-document;
-
 const onSubmit = async values => {
-  await sleep(300);
+  await postData(values);
   window.alert(JSON.stringify(values, 0, 2));
 };
 
@@ -479,11 +479,18 @@ class Form extends React.Component {
   }
 }
 
-export default Form;
-
 const getInfo = type => {
   let infos = values.filter(el => el.name === type);
   return Object.values(infos[0].values);
 };
 
 const streets = getInfo("STREET_TYPE");
+
+const mapDispatch = dispatch => ({
+  sendData: data => dispatch({ type: "SEND_REGISTATION", data: data })
+});
+
+export default connect(
+  null,
+  mapDispatch
+)(Form);
