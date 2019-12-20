@@ -311,7 +311,7 @@ class Form extends React.Component {
           <legend>Види діяльності</legend>
           <div>
             <label className="touched" htmlFor="owner_property_type">
-              Обов'язковий КВЕД*
+              Обовязковий КВЕД*
             </label>
             <select
               name="owner_property_type"
